@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<title>Vue.jsでフック</title>
+<script src="https://unpkg.com/vue@2.5.17"></script>
+
+<div id="app">
+    <p>{{ count }}</p>
+</div>
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            count: 0,
+            timerId: null
+        },
+        created: function(){
+            console.log('created')
+            var that = this
+            //参照可能
+            console.log(this.count)
+            //DOM要素が紐づいていないため、undefined
+            console.log(this.$el)
+            //タイマー処理を開始する
+            this.timerId = setInterval(function(){
+                that.count += 1
+            }, 1000)
+        },
+        mounted: function(){
+            console.log('mounted')
+            //DOM要素が紐づいているため、参照可能
+            console.log(this.$el)
+        },
+        beforeDestory: function(){
+            console.log('beforeDestory')
+            //タイマーの後始末
+            clearInterval(this.timerId)
+        }
+    })
+</script>

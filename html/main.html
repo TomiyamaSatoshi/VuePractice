@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<title>初めてのVue.js</title>
+<script src="https://unpkg.com/vue@2.5.17"></script>
+
+<div id="app">
+    <p>
+        {{message}}
+    </p>
+</div>
+
+<script>
+    //ロードされ、Vueがグローバル変数として定義されているか確認
+    console.assert(typeof Vue !== 'undefined');
+
+    new Vue({
+        el:'#app',
+        data:{
+            message:'こんにちは'
+        }
+    });
+</script>
