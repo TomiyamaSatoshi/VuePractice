@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<title>Vue.jsコンポーネント学習</title>
+<script src="https://unpkg.com/vue@2.5.17"></script>
+
+<div id="fruits-component">
+    <ol>
+        <fruits-item-name v-for="fruit in fruitsItems" :key="fruit.name" :fruits-item="fruit"></fruits-item-name>
+    </ol>
+</div>
+
+<script>
+    Vue.component('fruits-item-name',{
+        props: {
+            //親から受け取れるものの属性指定
+            fruitsItem:{ //バインドしている名前に紐づく（７行目）（キャラメルケース）
+                type: Object,
+                required: true
+            }
+        },
+        //こいつがテンプレートとして定義される。今回はこいつがv-forで繰り返される
+        template: '<li>{{ fruitsItem.name }}</li>'
+    })
+    new Vue({
+        el: '#fruits-component',
+        data: {
+            fruitsItems: [ //v-forの配列名に紐づいている（７行目）
+                { name: '梨' },
+                { name: 'イチゴ'}
+            ],
+        }
+    })
+</script>
