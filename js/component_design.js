@@ -1,5 +1,6 @@
 var headerTemplate = `
     <div id="fruits-list">
+        <!-- 親から何も渡ってきていない場合、これが表示される -->
         <slot name="header">No title</slot>
     </div>
 `
