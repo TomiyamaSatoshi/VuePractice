@@ -3,15 +3,40 @@
     <head>
         <meta charset="UTF-8">
         <title>Vue.js SPAのサンプルアプリケーション</title>
-        <script src="https://unpkg.com/vue@2.5.17"></script>
     </head>
     <body>
         <div id="app">
-            <router-link to="/top">トップページ</router-link>
-            <router-link to="/users">ユーザー一覧ページ</router-link>
+            <nav>
+                <router-link to="/top">トップページ</router-link>
+                <router-link to="/users">ユーザー一覧ページ</router-link>
+            </nav>
             <router-view></router-view>
         </div>
+        <script src="https://unpkg.com/vue@2.5.17"></script>
         <script src="https://unpkg.com/vue-router@3.0.1"></script>
+        <script type="text/x-template" id="user-list">
+            <div>
+                <div class="loading" v-if="loading">読み込み中...</div>
+                <div v-if="error" class="error">
+                    {{ error }}
+                </div>
+                <div v-for="user in users" :key="user-id">
+                    <router-link :to="{ path: '/users/' + user.id }">{{ user.name }}</router-link>
+                </div>
+            </div>
+        </script>
+        <script type="text/x-template" id="user-detail">
+            <div>
+                <div class="loading" v-if="loading">読み込み中...</div>
+                <div v-if="error" class="error">
+                    {{ error }}
+                </div>
+                <div v-if="user">
+                    <h2>{{ user.name }}</h2>
+                    <p>{{ user.description }}</p>
+                </div>
+            </div>
+        </script>
         <script src="../js/router_base.js"></script>
     </body>
 </html>
