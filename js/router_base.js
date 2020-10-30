@@ -1,24 +1,4 @@
-/*************************
- * 擬似API群
- *************************/
-//ユーザー一覧
-var getUsers = function(callback){
-    console.log("getUsersコールバック")
-    setTimeout(function(){
-        console.log("seTimeoutメソッド")
-        callback(null, [
-            {
-                id: 1,
-                name: "Takuya Tejima"
-            },
-            {
-                id: 2,
-                name: "Yohei Noda"
-            }
-        ])
-    }, 1000)
-}
-//ユーザー詳細
+//サンプルデータ
 var userData = [
     {
         id: 1,
@@ -31,6 +11,19 @@ var userData = [
         description: 'アウトドア・フットサルが好きなエンジニアです。'
     }
 ]
+
+/*************************
+ * 擬似API群
+ *************************/
+//ユーザー一覧
+var getUsers = function(callback){
+    console.log("getUsersコールバック")
+    setTimeout(function(){
+        console.log("seTimeoutメソッド")
+        callback(null, userData)
+    }, 1000)
+}
+//ユーザー詳細
 var getUser = function(userId, callback){
     setTimeout(function(){
         var filteredUsers = userData.filter(function(user){
@@ -43,9 +36,32 @@ var getUser = function(userId, callback){
 var postUser = function(params, callback){
     setTimeout(function(){
         params.id = userData.length + 1
+        console.log('登録する名前: ' + params.name)
+        console.log('登録する説明文: ' + params.description)
         userData.push(params)
+        console.log('userData: ' + userData)
         callback(null, params)
     }, 1000)
+}
+//認証
+var Auth = {
+    login: function(email, pass, cb){
+        setTimeout(function(){
+            if(email === 'vue@example.com' && pass === 'vue'){
+                localStorage.token = Math.random().toString(36).substring(7)
+                if(cb){ cb(true) }
+            }else{
+                if(cb){ cb(false) }
+            }
+        }, 0)
+    },
+    logout: function(){
+        delete localStorage.token
+    },
+    loggedIn: function(){
+        //!!（反転しないで、オブジェクトが存在すればtrue、存在しなければfalse
+        return !!localStorage.token
+    }
 }
 
 /*************************
@@ -155,6 +171,30 @@ var UserCreate = {
         }
     }
 }
+//ログイン
+var Login = {
+    template: '#login',
+    data: function(){
+        return{
+            email: 'vue@example.com',
+            pass: '',
+            error: false
+        }
+    },
+    methods: {
+        login: function(){
+            Auth.login(this.email, this.pass, (function(loggedIn){
+                if(!loggedIn){
+                    console.log('ログイン失敗')
+                    this.error = true
+                }else{
+                    console.log('ログイン成功')
+                    this.$router.replace(this.$route.query.redirect || '/')
+                }
+            }).bind(this))
+        }
+    }
+}
 
 /*************************
  * VueRouterインスタンス
@@ -173,11 +213,36 @@ var router = new VueRouter({
         },
         {
             path: '/users/new',
-            component: UserCreate
+            component: UserCreate,
+            beforeEnter: function(to, from, next){
+                if(!Auth.loggedIn()){
+                    next({
+                        path: '/login',
+                        query: { redirect: to.fullPath }
+                    })
+                }else{
+                    next()
+                }
+            }
         },
         {
             path: '/users/:userId',
             component: UserDetail
+        },
+        {
+            path: '/login',
+            component: Login
+        },
+        {
+            path: '/logout',
+            beforeEnter: function(to, from, next){
+                Auth.logout()
+                next('/')
+            }
+        },
+        {
+            path: '*',
+            redirect: '/top'
         }
     ]
 })
@@ -186,5 +251,8 @@ var router = new VueRouter({
  * Vueインスタンス
  *************************/
 var app = new Vue({
+    data: {
+        Auth: Auth
+    },
     router: router
 }).$mount('#app')
