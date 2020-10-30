@@ -1,3 +1,7 @@
+/*************************
+ * 擬似API群
+ *************************/
+//ユーザー一覧
 var getUsers = function(callback){
     console.log("getUsersコールバック")
     setTimeout(function(){
@@ -14,7 +18,7 @@ var getUsers = function(callback){
         ])
     }, 1000)
 }
-
+//ユーザー詳細
 var userData = [
     {
         id: 1,
@@ -27,7 +31,6 @@ var userData = [
         description: 'アウトドア・フットサルが好きなエンジニアです。'
     }
 ]
-
 var getUser = function(userId, callback){
     setTimeout(function(){
         var filteredUsers = userData.filter(function(user){
@@ -36,7 +39,19 @@ var getUser = function(userId, callback){
         callback(null, filteredUsers && filteredUsers[0])
     }, 1000)
 }
+//ユーザー作成
+var postUser = function(params, callback){
+    setTimeout(function(){
+        params.id = userData.length + 1
+        userData.push(params)
+        callback(null, params)
+    }, 1000)
+}
 
+/*************************
+ * コンポーネント群
+ *************************/
+//ユーザー一覧
 var UserList = {
     template: "#user-list",
     data: function(){
@@ -69,7 +84,7 @@ var UserList = {
         }
     }
 }
-
+//ユーザー詳細
 var UserDetail = {
     template: '#user-detail',
     data: function(){
@@ -99,7 +114,51 @@ var UserDetail = {
         }
     }
 }
+//ユーザー作成
+var UserCreate = {
+    template: '#user-create',
+    data: function(){
+        return{
+            sending: false,
+            user: this.defaultUser(),
+            error: null
+        }
+    },
+    created: function(){},
+    methods: {
+        defaultUser: function(){
+            return{
+                name: '',
+                description: ''
+            }
+        },
+        createUser: function(){
+            if(this.user.name.trim() === ''){
+                this.error = 'Nameは必須です。'
+                return
+            }
+            if(this.user.description.trim() === ''){
+                this.error = 'Descriptionは必須です。'
+                return
+            }
+            postUser(this.user, (function(err, user){
+                this.sending = false
+                if(err){
+                    this.error = err.toString()
+                }else{
+                    this.error = null
+                    this.user = this.defaultUser()
+                    alert('新規ユーザーが登録されました。')
+                    this.$router.push('/users')
+                }
+            }).bind(this))
+        }
+    }
+}
 
+/*************************
+ * VueRouterインスタンス
+ *************************/
 var router = new VueRouter({
     routes: [
         {
@@ -113,12 +172,19 @@ var router = new VueRouter({
             component: UserList
         },
         {
+            path: '/users/new',
+            component: UserCreate
+        },
+        {
             path: '/users/:userId',
             component: UserDetail
         }
     ]
 })
 
+/*************************
+ * Vueインスタンス
+ *************************/
 var app = new Vue({
     router: router
 }).$mount('#app')
