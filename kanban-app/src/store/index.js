@@ -6,7 +6,6 @@ import mutations from './mutations'
 
 Vue.use(Vuex)
 
-//状態Authと状態BoardをVuexのstateで一元管理できるように定義する
 const state = {
   auth: {
     token: null,
